@@ -45,7 +45,15 @@ async fn main() -> SdkResult<()> {
             ..Default::default() // Using default values for other fields
         },
         meta: None,
-        instructions: None,
+        instructions: Some(
+            "This is a Human-in-the-Loop MCP server that enables AI assistants to request \
+             information from humans via Discord. Use the 'ask_human' tool when you need \
+             information that only a human would know, such as: personal preferences, \
+             project-specific context, local environment details, or any information that \
+             is not publicly available or documented. The human will be notified in Discord \
+             and their response will be returned to you."
+                .to_string(),
+        ),
         protocol_version: LATEST_PROTOCOL_VERSION.to_string(),
     };
 

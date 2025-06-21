@@ -12,7 +12,7 @@ pub trait Human: Send + Sync + 'static {
 
 #[mcp_tool(
     name = "ask_human",
-    description = "Ask a human a question",
+    description = "Ask a human for information that only they would know, such as personal preferences, project-specific context, local environment details, or non-public information",
     idempotent_hint = false,
     destructive_hint = false,
     open_world_hint = false,
@@ -20,7 +20,7 @@ pub trait Human: Send + Sync + 'static {
 )]
 #[derive(Debug, Deserialize, Serialize, JsonSchema)]
 pub struct AskHumanTool {
-    /// The question to ask the human.
+    /// The question to ask the human. Be specific and provide context to help the human understand what information you need.
     question: String,
 }
 impl AskHumanTool {
