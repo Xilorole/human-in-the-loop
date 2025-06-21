@@ -72,11 +72,12 @@ impl Human for HumanInDiscord {
         let thread = self
             .thread
             .get_or_try_init(|| async {
+                let thread_title = question.chars().take(100).collect::<String>();
                 let channel = self
                     .channel_id
                     .create_thread(
                         &ctx.http,
-                        CreateThread::new(question)
+                        CreateThread::new(thread_title)
                             .auto_archive_duration(AutoArchiveDuration::OneDay)
                             .kind(ChannelType::PublicThread),
                     )
