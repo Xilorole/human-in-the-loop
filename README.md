@@ -110,3 +110,7 @@ The AI posts questions in Discord and mentions the specified user. When the user
 
 ### Getting User ID
 1. Right-click on user → "Copy ID"
+
+## Roadmap
+
+- **Future Migration to MCP Elicitation**: Once MCP's Elicitation implementation becomes more widespread and standardized, we plan to migrate the UI from Discord to native MCP Elicitation. This will provide a more integrated experience directly within MCP-compatible clients.
