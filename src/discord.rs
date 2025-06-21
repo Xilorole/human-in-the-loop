@@ -88,10 +88,10 @@ impl Human for HumanInDiscord {
         thread
             .send_message(&ctx.http, CreateMessage::new().content(message_text))
             .await?;
-        let message =
-            thread.await_reply(ctx).await.ok_or_else(|| {
-                anyhow::anyhow!("Failed to await message from the human in Discord")
-            })?;
+        let message = thread
+            .await_reply(ctx)
+            .await
+            .ok_or_else(|| anyhow::anyhow!("Failed to await message from the human in Discord"))?;
         Ok(message.content)
     }
 }
