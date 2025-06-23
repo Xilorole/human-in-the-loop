@@ -31,7 +31,7 @@ This MCP server is used when AI assistants need human input or judgment during t
 ### 2. Install
 
 ```bash
-cargo install --git https://github.com/yourusername/human-in-the-loop.git
+cargo install --git https://github.com/KOBA789/human-in-the-loop.git
 ```
 
 ## Connecting with MCP Clients
