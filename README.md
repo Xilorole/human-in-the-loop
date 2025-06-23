@@ -2,6 +2,8 @@
 
 An MCP (Model Context Protocol) server that allows AI assistants to ask questions to humans via Discord.
 
+<img width="845" alt="Screenshot 2025-06-23 at 18 25 43" src="https://github.com/user-attachments/assets/dcdbb1a7-cb71-446e-b44d-bfe637059acb" />
+
 ## Overview
 
 This MCP server is used when AI assistants need human input or judgment during their work. For example:
