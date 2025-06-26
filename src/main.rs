@@ -1,4 +1,5 @@
 mod discord;
+mod slack;
 mod mcp_handler;
 mod tools;
 
