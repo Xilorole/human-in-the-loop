@@ -2,7 +2,7 @@ mod discord;
 mod slack;
 mod mcp_handler;
 mod tools;
-use crate::tools::Human;
+// use crate::tools::Human; // Removed unused import
 
 use clap::Parser;
 use discord::HumanInDiscord;
@@ -136,19 +136,65 @@ async fn main() -> SdkResult<()> {
             }
         }
         Platform::Slack => {
-            println!("Slack platform selected - using placeholder implementation");
-            // For now, just create a placeholder and exit cleanly
-            let slack = crate::slack::HumanInSlack::new(
-                args.slack_user_id.unwrap_or_default(),
-                args.slack_channel_id.unwrap_or_default(),
+            println!("🚀 Starting Slack platform...");
+
+            let Args {
+                slack_app_token: Some(slack_app_token),
+                slack_bot_token: Some(slack_bot_token), // This is available from args but not used in the HumanInSlack::new or start_socket_mode yet.
+                slack_channel_id: Some(slack_channel_id),
+                slack_user_id: Some(slack_user_id),
+                ..
+            } = args else {
+                eprintln!("❌ Missing required Slack configuration");
+                std::process::exit(1);
+            };
+
+            // Create Slack human implementation
+            let slack_human = crate::slack::HumanInSlack::new(slack_user_id, slack_channel_id, slack_bot_token)
+                .map_err(|e| McpSdkError::AnyError(e.into_boxed_dyn_error()))?;
+
+            // Prepare MCP server
+            let server_details = InitializeResult {
+                server_info: Implementation {
+                    name: "Human in the loop".to_string(),
+                    version: "0.1.0".to_string(),
+                },
+                capabilities: ServerCapabilities {
+                    tools: Some(ServerCapabilitiesTools { list_changed: None }),
+                    ..Default::default()
+                },
+                meta: None,
+                instructions: Some(
+                    "This is a Human-in-the-Loop MCP server using Slack platform. \
+                     Use the 'ask_human' tool when you need information from humans.".to_string()
+                ),
+                protocol_version: LATEST_PROTOCOL_VERSION.to_string(),
+            };
+
+            let transport = StdioTransport::new(TransportOptions::default())?;
+            let server: ServerRuntime = server_runtime::create_server(
+                server_details,
+                transport,
+                mcp_handler::Handler::new(slack_human.clone())
             );
 
-            let test_response = slack.ask("Hello from Slack!").await
-                .map_err(|e| McpSdkError::AnyError(e.into_boxed_dyn_error()))?;
-            println!("Slack placeholder response: {}", test_response);
+            // Start both MCP server and Slack Socket Mode
+            let mcp_task = server.start();
+            // Clone slack_human again for the new task if it's consumed or needs separate ownership context
+            let slack_task = slack_human.start_socket_mode(slack_app_token);
 
-            // TODO: Full Slack implementation will be added in later tickets
-            println!("Slack integration coming soon! For now, use Discord platform.");
+            println!("✅ Starting MCP server and Slack Socket Mode...");
+
+            tokio::select! {
+                res = mcp_task => {
+                    println!("🛑 MCP server ended: {:?}", res);
+                    res?
+                },
+                res = slack_task => {
+                    println!("🛑 Slack Socket Mode ended: {:?}", res);
+                    res.map_err(|e| McpSdkError::AnyError(e.into_boxed_dyn_error()))?
+                },
+            }
         }
     }
 
